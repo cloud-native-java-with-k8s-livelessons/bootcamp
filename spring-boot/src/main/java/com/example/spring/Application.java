@@ -6,13 +6,14 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.util.Objects;
 
@@ -25,7 +26,7 @@ public class Application {
 	}
 
 	@Bean
-	ApplicationRunner runner( CustomerService customerService) {
+	ApplicationRunner runner(CustomerService customerService) {
 		return args -> System.out.println(customerService.save("Tammie"));
 	}
 
@@ -37,6 +38,19 @@ interface CustomerService {
 	Customer findById(Integer id);
 }
 
+@Controller
+@RequiredArgsConstructor
+@ResponseBody
+class CustomerRestController {
+
+	private final CustomerService customerService;
+
+	@GetMapping("/customers/{id}")
+	Customer byId(@PathVariable Integer id) {
+		return this.customerService.findById(id);
+	}
+}
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -46,7 +60,6 @@ class JdbcCustomerService implements CustomerService {
 
 	@Override
 	public Customer save(String name) {
-
 		var gkh = new GeneratedKeyHolder();
 		this.template.update(connection -> {
 			var ps = connection
