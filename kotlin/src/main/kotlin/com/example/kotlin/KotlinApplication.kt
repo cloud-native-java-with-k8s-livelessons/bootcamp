@@ -30,4 +30,5 @@ fun main(args: Array<String>) {
 }
 
 interface CustomerRepository : ReactiveCrudRepository<Customer, Int>
+
 data class Customer(@Id val id: Int, val name: String)

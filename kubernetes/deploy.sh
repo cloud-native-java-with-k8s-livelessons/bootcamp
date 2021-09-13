@@ -5,8 +5,10 @@ cd $(dirname $0 )
 HERE=$( pwd )
 
 NS=cnj
-IMAGE_NAME=gcr.io/bootiful/cnj-basics:0.0.1-SNAPSHOT
 APP_NAME=customers
+MANIFESTS_DIR=$HERE/k8s/manifests
+IMAGE_NAME=gcr.io/bootiful/cnj-basics:latest 
+## ^ notice that we tag the image as 'latest', which Kubernetes will automatically redeploy everytime
 
 ## docker 
 ./mvnw -DskipTests=true clean package spring-boot:build-image -Dspring-boot.build-image.imageName=${IMAGE_NAME}
@@ -14,15 +16,16 @@ APP_NAME=customers
 docker push $IMAGE_NAME
 
 ## kubernetes
-MANIFESTS_DIR=$HERE/k8s/manifests
 mkdir -p $MANIFESTS_DIR 
-kubectl create ns $NS  -o yaml > $MANIFESTS_DIR/namespace.yaml || echo "No need to create the production $NS"
+kubectl create ns $NS  -o yaml > $MANIFESTS_DIR/namespace.yaml  
 kubectl -n $NS create deployment  --image=$IMAGE_NAME $APP_NAME -o yaml > $MANIFESTS_DIR/deployment.yaml
 kubectl -n $NS expose deployment $APP_NAME --port=8080 -o yaml > $MANIFESTS_DIR/service.yaml
-kubectl -n $NS port-forward deployment/$APP_NAME 8080:8080 
+sleep 5
+kubectl -n $NS port-forward deployment/$APP_NAME 8080:8080  &
 
 curl -s localhost:8080/actuator/health/liveness | jq
 
+kubectl logs -n cnj deployments/$APP_NAME
 
 # 1. test readiness / liveness actuators
 
