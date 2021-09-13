@@ -2,28 +2,33 @@ package com.example.spring;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 
+@ComponentScan
 @Configuration
 class ApplicationWiringConfiguration {
 
-	@Bean
+//	@Bean
 	MyDataSource myDataSource() {
 		return new MyDataSource();
 	}
 
-	@Bean
+//	@Bean
 	CustomerService customerService(MyDataSource dataSource) {
 		return new CustomerService(dataSource);
 	}
 }
 
 
+@Component
 class MyDataSource {
 }
 
 
+@Component
 class CustomerService {
 
 	private final MyDataSource myDataSource;
