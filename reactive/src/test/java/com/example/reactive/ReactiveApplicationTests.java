@@ -1,10 +1,10 @@
-package com.example.basicsreactive;
+package com.example.reactive;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class BasicsReactiveApplicationTests {
+class ReactiveApplicationTests {
 
 	@Test
 	void contextLoads() {
